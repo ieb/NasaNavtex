@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Navtex</title>
+<style>
+    .messageBody {
+        display: none;
+    }
+    #safe {
+        display: none;
+    }
+    .messageId:hover {
+        background-color: seagreen;
+    }
+    .messageId[selected='selected'] {
+        background-color: palegreen;
+    }
+    #messageIds {
+        margin-right: 1rex;
+        height: 200px;
+        width: 75px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+    }
+    #messageBodies {
+        margin: 1rex;
+        display: grid;
+    }
+    .messageBody[selected='selected'] {
+        display: block;
+        float: right;
+        font-family: monospace;
+        border: 1px solid;
+        margin: 3px;
+        padding: 3px;
+    }
+    .messageListing {
+        display: flex;
+    }
+</style>
+</head>
+<body>
+<button id="connect">Sync</button>
+<button id="clear">Clear</button> 
+<select id="navarea">
+</select>
+<select id="frequency" multiple="multiple">
+    <option id='a' selected="selected">512KHz</option>
+    <option id='b'>490KHz</option>
+</select>
+<select id="stations" multiple="multiple">
+</select>
+<select id="messageTypes" multiple="multiple">
+</select>
+<div class="messageListing">
+<div id="messageIds"> </div>
+<div id="messageBodies"> </div>
+</div>
+<div id="safe"> </div>
+<script type="module">
+
+
+const navtexStations = {
+    navareas: {
+        'I': {
+            title: 'North Atlantic, North Sea, Baltic Sea',
+            'a': {
+                'A':'Svalbard NOR',
+                'B': 'Bodø    NOR', 
+                'C': 'Vardø   NOR', 
+                'D': 'Tórshavn    FRO', 
+                'E': 'Niton   GBR', 
+                'G': 'Cullercoats GBR', 
+                'H': 'Bjuröklubb  SWE', 
+                'I': 'Grimeton    SWE', 
+                'J': 'Gislövshammar SWE',
+                'K': 'Niton   GBR', 
+                'L': 'Rogaland    NOR', 
+                'M': 'Jeløy   NOR', 
+                'N': 'Ørlandet    NOR', 
+                'O': 'Portpatrick GBR', 
+                'P': 'Netherlands Coastguard  NLD', 
+                'Q': 'Malin Head  IRL', 
+                'R': 'Saudanes    ISL', 
+                'S': 'Pinneberg   DEU', 
+                'T': 'Oostende    BEL', 
+                'F': 'Tallinn EST', 
+                'V': 'Oostende    BEL', 
+                'W': 'Valentia    IRL', 
+                'X': 'Grindavik   ISL' 
+            },
+            'b': {
+                'B': 'Oostende    BE',
+                'C': 'Portpatrick GBR',
+                'E': 'Saudanes    ISL',
+                'I': 'Niton   GBR',
+                'K': 'Grindavik   ISL',
+                'L': 'Pinneberg   DEU',
+                'U': 'Cullercoats GBR'
+            }
+        },
+        "II": {
+            title: 'East Atlantic',
+            'a': {
+                'A':  'Cross Corsen    FRA',
+                'D':  'Coruna  ESP',
+                'F':  'Horta   POR',
+                'G':  'Tarifa  ESP',
+                'I':  'Las Palmas  ESP',
+                'M':  'Casablanca  MRC',
+                'P':  'Porto Santo POR',
+                'R':  'Monsanto    POR',
+                'U':  'Ribeira de Vinha    CPV',
+                'X':  'Cabo La Nao ESP'
+            },
+            'b': {
+                'A':  'Las Palmas  ESP',
+                'E':  'Cross Corsen    FRA',
+                'G':  'Monsanto    POR',
+                'J':  'Horta   POR',
+                'M':  'Porto Santo POR',
+                'M':  'Cabo La Nao ESP',
+                'P':  'São Vicente CPV',
+                'T':  'Niton   GBR',
+                'T':  'Tarifa  ESP',
+                'W':  'Coruna  ESP',
+            }
+
+        },
+        "III": {
+            title: 'Mediterranean Sea',
+            'a': {
+                'A':  'Novorossijsk    RUS',
+                'B':  'Algiers ALG',
+                'B':  'Kerch   RUS',
+                'C':  'Odesa   UKR',
+                'D':  'Istanbul    TUR',
+                'E':  'Samsun  TUR',
+                'F':  'Antalya TUR',
+                'H':  'Iraklio GRC',
+                'I':  'İzmir   TUR',
+                'J':  'Varna   BUL',
+                'K':  'Kerkyra GRC',
+                'L':  'Limnos  GRC',
+                'M':  'Cyprus  CYP',
+                'N':  'Alexandria  EGY',
+                'O':  'Malta   MLT',
+                'P':  'Haifa   ISR',
+                'Q':  'Split   HRV',
+                'R':  'La Maddalena    ITA',
+                'T':  'Kelibia TUN',
+                'U':  'Mondolfo    ITA',
+                'V':  'Sellia Marina   ITA',
+                'W':  'Cross La Garde  FRA',
+                'X':  'Cabo de la Nao  ESP'
+            },
+            'b': {
+                'A':  'Samsun  TUR',
+                'B':  'Istanbul    TUR',
+                'C':  'İzmir   TUR',
+                'D':  'Antalya TUR',
+                'E':  'Mondolfo    ITA',
+                'I':  'La Maddalena    ITA',
+                'L':  'Constanța   ROU',
+                'M':  'Cabo de la Nao  ESP',
+                'N':  'Piombino    ITA',
+                'P':  'Kerkyra GRC',
+                'Q':  'Iraklio GRC',
+                'R':  'Limnos  GRC',
+                'S':  'Cross La Garde  FRA',
+                'W':  'Sellia Marina   ITA'
+
+            }
+
+        },
+        "IV": {
+            title: 'West Atlantic',
+            'a': {
+                'A':  'Miami   USA',
+                'B':  'Bermuda Harbour BER',
+                'C':  'Rivière-au-Renard   CAN',
+                'E':  'Charleston  USA',
+                'E':  'Savannah    USA',
+                'F':  'Boston  USA',
+                'G':  'New Orleans USA',
+                'H':  'Wiarton CAN',
+                'H':  'Curacao NLD',
+                'N':  'Portsmouth  USA',
+                'O':  "St. John's  CAN",
+                'P':  'Thunder Bay CAN',
+                'Q':  'Sydney (Nova Scotia)    CAN',
+                'R':  'Isabela (Puerto Rico)   USA',
+                'T':  'Iqaluit CAN',
+                'U':  'Saint John (Yarmouth)   CAN',
+                'W':  'Kook Island (Nuuk)  DNK',
+                'X':  'Labrador    CAN'
+            },
+            'b': {
+                'D':  'Rivière-au-Renard   CAN',
+                'J':  'Sydney (Nova Scotia)    CAN',
+                'S':  'Iqaluit CAN',
+                'V':  'Yarmouth    CAN'
+            }
+
+        },
+        "V": {
+            title: 'Brasil (none use Imarsat C)',
+            'a': {},
+            'b': {},
+
+        },
+        "VI": {
+            title: 'Argentina, Uruguay',
+            'a': {
+                'F':  'La Paloma   URG',
+                'M':  'Ushuaia ARG',
+                'N':  'Rio Gallegos    ARG',
+                'O':  'Comodoro Rivadavia  ARG',
+                'P':  'Bahía Blanca    ARG',
+                'Q':  'Mar del Plata   ARG',
+                'R':  'Buenos Aires    ARG'
+            },
+            'b': {
+                'A':  'La Paloma   URG',
+                'A':  'Ushuaia ARG',
+                'B':  'Rio Gallegos    ARG',
+                'C':  'Comodoro Rivadavia  ARG',
+                'D':  'Bahía Blanca    ARG',
+                'E':  'Mar del Plata   ARG',
+                'F':  'Buenos Aires    ARG'
+            }
+
+
+        },
+        "VII": {
+            title: 'South Africa',
+            'a': {
+                'B':  'Walvis Bay  NMB',
+                'C':  'Cape Town   AFS',
+                'I':  'Port Elizabeth  AFS',
+                'O':  'Durban  AFS'
+            },
+            'b': {}
+
+        },
+        "VIII": {
+            title: 'India',
+            'a': {
+                'C':  'Mauritius   MAU',
+                'G':  'Bombay  IND',
+                'P':  'Madras  IND'
+            },
+            'b': {}
+
+        },
+        "IX": {
+            title: 'Arabia',
+            'a': {
+                'A':  'Bushehr IRN',
+                'B':  'Hamala  BHR',
+                'F':  'Bandar Abbas    IRN',
+                'H':  'Jeddah  ARS',
+                'M':  'Muscat  OMA',
+                'P':  'Karachi PAK',
+                'V':  'Quseir  EGY',
+                'X':  'Serapeum (Ismailia) EGY'
+            },
+            'b': {}
+
+        },
+        "X": {
+            title: 'Australia, Imarsat C only',
+            'a': {},
+            'b': {}
+
+        },
+        "XI": {
+            title: 'East Asia',
+            'a': {
+                'A':  'Jayapura    INS',
+                'B':  'Ambon   INS',
+                'C':  'Singapore   SNG',
+                'D':  'Makassar    INS',
+                'E':  'Jakarta INS',
+                'E':  'Hungnam KRE',
+                'F':  'Bangkok THA',
+                'G':  'Naha    JPN',
+                'H':  'Moji    JPN',
+                'I':  'Puerto Princesa',
+                'I':  'Yokohama    JPN',
+                'J':  'Manila  PHL',
+                'J':  'Otaru   JPN',
+                'K':  'Davao City',
+                'K':  'Kushiro JPN',
+                'L':  'Hongkong    HKG',
+                'M':  'Sanya   CHN',
+                'N':  'Guangzhou   CHN',
+                'O':  'Fuzhou  CHN',
+                'P':  'Da Nang',
+                'P':  'Chilung TWN',
+                'P':  'Kaohsiung   TWN',
+                'Q':  'Shanghai    CHN',
+                'R':  'Dalian  CHN',
+                'S':  'Sandakan    MLA',
+                'T':  'Miri    MLA',
+                'U':  'Penang  MLA',
+                'V':  'Guam    GUM',
+                'V':  'Jukbyeon    KOR',
+                'W':  'Byeonsan    KOR',
+                'X':  'Ho Chi',
+            },
+            'b': {
+                'J':  'Jukbyeon    KOR',
+                'K':  'Byeonsan    KOR',
+                'W':  'Hai Phong   VTN'
+            }
+
+        },
+        "XII": {
+            title: 'Eastern Pacific',
+            'a': {
+                'C':  'San Francisco',
+                'D':  'Prince Rupert',
+                'H':  'Tofino  CAN',
+                'J':  'Kodiak  ALS',
+                'L':  'Ayora   EQA',
+                'M':  'Guayaquil   EQA',
+                'O':  'Honolulu    HWA',
+                'Q':  'Cambria USA',
+                'W':  'Astoria USA',
+                'X':  'Kodiak  ALS' 
+            },
+            'b': {
+                'A':  'Ayora   EQA',
+            }
+
+        },
+        "XIII": {
+            title: 'Russia',
+            'a': {
+                'B':  'Kholmsk RUS',
+                'C':  'Murmansk    RUS',
+                'F':  'Archangelsk RUS',
+                'C':  'Petropavlosk    RUS',
+                'W':  'Astrakhan   RUS',
+                'A':  'Vladivostok RUS',
+                'G':  'Okhotsk RUS',
+                'D':  'Magadan RUS',
+            }
+
+        },
+        "XIV": {
+            title: 'New Zealand, Southern Pacific, none',
+            'a': {},
+            'b': {}
+
+        },
+        "XV": {
+            title: 'Chile',
+            'a': {
+                'A':  'Antofagasta CHL',
+                'B':  'Valparaíso  CHL',
+                'C':  'Talcahuano  CHL',
+                'D':  'Puerto Montt',
+                'E':  'Punta Arenas',
+                'F':  'Easter Island'
+            },
+            'b': {
+                'G':  'Easter Island',
+                'H':  'Antofagasta CHL',
+                'I':  'Valparaíso  CHL',
+                'J':  'Talcahuano  CHL',
+                'K':  'Puerto Montt',
+                'L':  'Punta Arenas'
+            }
+
+        },
+        "XVI": {
+            title: 'Peru',
+            'a': {
+                'S':  'Paita   PRU',
+                'U':  'Callao  PRU',
+                'W':  'Mollendo    PRU'
+            },
+            'b': {}
+        },
+
+    },
+    messageTypes: {
+        'A':  'Navigational warnings',
+        'B':  'Meteorological warnings',
+        'C':  'Ice reports',
+        'D':  'Search & rescue, and pirate warnings',
+        'E':  'Meteorological forecasts',
+        'F':  'Pilot service',
+        'G':  'AIS messages',
+        'H':  'LORAN messages',
+        'I':  'OMEGA messages',
+        'J':  'SATNAV messages',
+        'K':  'Other electronic',
+        'L':  'Navigational warnings',
+        'T':  'Test transmissions',
+        'V':  'Notice to fishermen',
+        'W':  'Environmental',
+        'X':  'Special services',
+        'Y':  'Special services',
+        'Z':  'No message'
+    }
+}    
+
+let selectedNavarea = 'I';
+let selectedFrequency = 'a';
+const navareaSelect = document.getElementById('navarea');
+const stationsSelect = document.getElementById('stations');
+const frequencySelect = document.getElementById('frequency');
+const messageTypeSelect = document.getElementById('messageTypes');
+const renderNavareaSelector = () => {
+    Object.keys(navtexStations.navareas).forEach((na) => {
+        const opt = document.createElement('option');
+        opt.setAttribute('id', na);
+        opt.innerHTML = `${na} ${navtexStations.navareas[na].title}`;
+        navareaSelect.append(opt);
+    });
+}
+const renderMessageTypes = () => {
+    Object.keys(navtexStations.messageTypes).forEach((mt) => {
+        const opt = document.createElement('option');
+        opt.setAttribute('id', mt);
+        opt.innerHTML = `${mt} ${navtexStations.messageTypes[mt]}`;
+        messageTypeSelect.append(opt);
+    });
+}
+const renderStations = () => {
+    console.log(navareaSelect.selectedIndex, frequencySelect.selectedOptions);
+    const area = navareaSelect.options[navareaSelect.selectedIndex].id;
+    stationsSelect.innerHTML = '';
+    Object.values(frequencySelect.selectedOptions).forEach((frequency) => {
+        const stations = navtexStations.navareas[area][frequency.id];
+        const f = frequency.value;
+        console.log(frequency, stations);
+        if ( stations ) {
+            Object.keys(stations).forEach((station) => {
+                const opt = document.createElement('option');
+                opt.setAttribute('id', `${frequency.id}${station}`);
+                opt.innerHTML = `${f} ${station} ${stations[station]}`;
+                stationsSelect.append(opt);
+            });            
+        }
+
+    })
+};
+
+const filterStations = () => {
+    const filters = [];
+    Object.values(stationsSelect.selectedOptions).forEach((station) => {
+        Object.values(messageTypes.selectedOptions).forEach((mt) => {
+            filters.push(`${station.id}${mt.id}`);
+
+        });
+    });
+
+    console.log(filters);
+    selectMessages(filters);
+};
+
+navareaSelect.addEventListener('change', (event) => {
+    renderStations();
+});
+frequencySelect.addEventListener('change', (event) => {
+    renderStations();
+});
+stationsSelect.addEventListener('change', (event) => {
+    filterStations();
+});
+messageTypeSelect.addEventListener('change', (event) => {
+    filterStations();
+});
+
+renderNavareaSelector();
+renderStations();
+renderMessageTypes();
+
+
+// Assume only the MLDP service exists const TANSPARENT_PRIVATE_SERVICE_UUID = "49535343-fe7d-4ae5-8fa9-9fafd205e455"
+
+function str2arr(str) {
+    var array = new ArrayBuffer(str.length);
+    var bufferView = new Uint8Array(array);
+    for (var i = 0; i < str.length; i++) {
+        bufferView[i] = str.charCodeAt(i);
+    }
+    return bufferView;
+}
+
+function arr2str(arr) {
+    return String.fromCharCode.apply(null, arr);
+}
+
+class NasaNavtex {
+    static MLDP_PRIVATE_SERVICE_UUID = "00035b03-58e6-07dd-021a-08123a000300";
+
+    static MLDP_DATA_PRIVATE_CHAR_UUID = "00035b03-58e6-07dd-021a-08123a000301";
+    static MLDP_CONTROL_PRIVATE_CHAR_UUID = "00035b03-58e6-07dd-021a-08123a0003ff";
+
+
+
+    constructor() {
+
+    }
+
+
+    async connect() {
+        const options = {
+          filters: [
+            { namePrefix: 'BtNavtex' },
+            { services: [NasaNavtex.MLDP_PRIVATE_SERVICE_UUID] },
+          ],
+        };
+
+        try {
+            console.log('Requesting Bluetooth Device...');
+            console.log(`with ${JSON.stringify(options)}`);
+            this.device = await navigator.bluetooth.requestDevice(options);
+
+            console.log(`> Name:             ${this.device.name}`);
+            console.log(`> Id:               ${this.device.id}`);
+            console.log(`> Connected:        ${this.device.gatt.connected}`);
+
+            const ondisconnect = () => {
+                console.log('server disconnected');
+                this.device.removeEventListener('gattserverdisconnected', ondisconnect);
+            };
+            this.device.addEventListener('gattserverdisconnected', ondisconnect);
+
+            this.server = await this.device.gatt.connect();
+
+
+            this.mdlpService = await this.server.getPrimaryService(NasaNavtex.MLDP_PRIVATE_SERVICE_UUID);
+            this.dataStream = await this.mdlpService.getCharacteristic(NasaNavtex.MLDP_DATA_PRIVATE_CHAR_UUID);
+
+            await this.dataStream.startNotifications();
+
+            return true;
+        } catch (e) {
+            console.log(e);
+            return false;
+        }
+    }
+
+    async disconnect() {
+        await this.dataStream.stopNotifications();
+        this.server.disconnect();
+        this.dataStream = undefined;
+        this.mdlpService = undefined;
+        this.device = undefined;
+        console.log('Disconnected')
+    }
+
+
+
+    sendRequest(request) {
+        return new Promise((resolve)=> {
+                console.log("Starting ", request);
+                let msg = '';
+                const interval = setInterval(() => {
+                    console.log("msg", JSON.stringify(msg))
+                }, 2000);
+                const td = new TextDecoder();
+                const listener = (event) => {
+
+                    const c = td.decode(event.target.value);
+                    msg = msg+c;
+                    const startChar = msg.charAt(0);
+                    if (msg.endsWith(',end') 
+                        || msg.endsWith('\r\nn\n')
+                        || msg.endsWith('\r\n\n')
+                        || msg === 'Command not recognized.') {
+                        console.log('end message detected', msg)
+                        this.dataStream.removeEventListener('characteristicvaluechanged', listener);
+                        clearInterval(interval);
+                        resolve(msg);
+                    }
+                };
+                this.dataStream.addEventListener('characteristicvaluechanged', listener);
+                this.dataStream.writeValueWithoutResponse(str2arr(request)).then(()=> {
+                    console.log("done sending");
+                });
+            })
+    }
+
+    async sync(cb) {;
+        cb = cb || (() => {})
+        const settings = await this.sendRequest('$#~');
+        cb('settings', settings);
+        const messageIds = (await this.sendRequest('$L~')).split(',');
+        cb('messageIds', messageIds);
+        for (var i = 0; i < messageIds.length; i++) {
+            const id =  messageIds[i];
+            if ( id !== 'end') {
+                const msg = await this.sendRequest(`$S,${id}~`)
+                cb(id, msg);
+            }
+        }
+
+    }
+
+}
+
+const messagesIds = document.getElementById('messageIds');
+const messagesBodies = document.getElementById('messageBodies');
+const safeEl = document.getElementById('safe');
+const messages = {};
+const makeSafe = (text) => {
+    safeEl.textContent = text;
+    return safeEl.textContent;
+}
+const updateMessage = (id, text) => {
+    messages[id] = text;
+    id = makeSafe(id);
+    const textLines = makeSafe(text).split('\n');
+    for (var i = 0; i < textLines.length; i++) {
+        const t = textLines[i].trim();
+        if (t.length === 0) {
+            textLines[i] = '<div>&nbsp;</div>';
+        } else {
+            textLines[i] = `<div>${t}</div>`;
+        }
+    }
+    text = textLines.join('');
+    let elId = document.getElementById(`key_${id}`);
+    if ( ! elId ) {
+        const newEl = document.createElement('div');
+        newEl.setAttribute('id',`key_${id}`);
+        newEl.setAttribute('class','messageId');
+        newEl.innerHTML = id;
+        newEl.addEventListener('click', () => {
+            const selected = newEl.getAttribute('selected');
+            if ( selected === 'selected') {
+                newEl.removeAttribute('selected');
+                document.getElementById(`msg_${id}`).removeAttribute('selected');
+            } else {
+                newEl.setAttribute('selected', 'selected');
+                document.getElementById(`msg_${id}`).setAttribute('selected', 'selected');
+            }
+        });            
+        messagesIds.append(newEl);
+    } else {
+        elId.innterHTML = id;
+    }
+    let elMsg = document.getElementById(`msg_${id}`);
+    if ( ! elId ) {
+        const newEl = document.createElement('div');
+        newEl.setAttribute('id',`msg_${id}`);
+        newEl.setAttribute('class','messageBody');
+        newEl.innerHTML = text;
+        messagesBodies.append(newEl);
+    } else {
+        elId.textContent = text;
+    }
+};
+
+const selectMessages = (filters) => {
+    document.querySelectorAll('.messageId').forEach((e) => {
+        const id = e.id.substring(4);
+        const key = id.substring(0,3);
+        console.log('selecting ',id, key);
+        if ( filters.includes(key)) {
+            e.setAttribute('selected', 'selected');
+            document.getElementById(`msg_${id}`).setAttribute('selected', 'selected');            
+        } else {
+            e.removeAttribute('selected');
+            document.getElementById(`msg_${id}`).removeAttribute('selected');            
+        }
+    })
+}
+
+const loadMessages = () => {
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        updateMessage(k,localStorage.getItem(k));
+    }
+};
+const saveMessages = () => {
+    Object.keys(messages).forEach((k) => {localStorage.setItem(k,messages[k]); });
+};
+
+document.getElementById('clear').addEventListener('click', () => {
+    localStorage.clear();
+    messagesEl.innerHTML = '';
+})
+
+loadMessages();
+
+document.getElementById('connect').addEventListener('click', async () => {
+    const navtex = new NasaNavtex();
+
+    if ( await navtex.connect() ){
+        const response = await navtex.sync(updateMessage);        
+        console.log(' Got response ', response);
+        await navtex.disconnect();
+
+        saveMessages();
+    } else {
+        console.log('Navtex reciever not found');
+    }
+
+});
+
+
+
+</script>
+
+</body>
+</html>
