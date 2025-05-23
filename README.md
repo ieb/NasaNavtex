@@ -1,5 +1,15 @@
 # Navtex UI for Nasa Navtex Bt3 device
 
+# UI
+
+Aims to provide a easier to use experience using navtex messages with OpenSea Map display of navigation warnings, search and sync. Works offline but also available online at https://blog.tfd.co.uk/NasaNavtex/ hosted directly from this repo.
+
+Messages are retrieved with the sync button which will use the Web BLE API to fetch messages and store in browser local storage. The messages are processed to detect lat lon and WZ cancel messages. Clicking on a message with one or more lat lon co-ordinates will display the points on an embedded openseamap.  The Navarea can be changes and stations or messages selected.
+
+![Screenshot of UI](screenshot.png)
+
+# Navtex reciever
+
 This device has a Microchip RN4020 BLE chip which supports Microchips MLDP protocol. This is essentially
 a BLE Gatt service (00035b03-58e6-07dd-021a-08123a000300) with a Gatt characteristic (00035b03-58e6-07dd-021a-08123a000301) which if written to will send the data over UART to the MCU connected to it, and when the MCU responds the Gatt characteristic will send a notification containing the response. Setup is relatively simple using the Web BLE API. Only BLE communication is required.
 
@@ -47,7 +57,7 @@ While the service worker can cache files, that cache does not perform well with 
 * [x] Skip re-download of messages with 0 FEC errors.
 * [ ] Add age of message download.
 * [x] Add support for search
-* [ ] Detect lat lon of form 50 10N 000 20E, 53-45.1N 003-54E RACON ON PLATFORM ROLF 55-36.4N
+* [x] Detect lat lon of form 50 10N 000 20E, 53-45.1N 003-54E RACON ON PLATFORM ROLF 55-36.4N
 004-29.5E INOPERATIVE.
 * [ ] Add Show on Map function
 * [x] Add scan functon to pre-load navarea by moving the map over a bounding box
