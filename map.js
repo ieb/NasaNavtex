@@ -37,7 +37,7 @@ export class OpenSeaMap {
         	tileBase = 'https:/';
         	console.log("Using cors for tiles");
         } else {
-        	console.log("Using same origin for tiles");
+        	console.log("Using same origin for tiles ",document.location.origin );
         }
 
         const popup = document.getElementById('popup');

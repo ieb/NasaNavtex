@@ -173,13 +173,15 @@ class UIControl {
         } else {
             for (let i = 0; i < localStorage.length; i++) {
                 const k = localStorage.key(i);
-                this.updateMessage(k,localStorage.getItem(k));
+                if ( k.startsWith('navtex_')) {
+                    this.updateMessage(k.replace('navtex_',''),localStorage.getItem(k));
+                }
             }
         }
     };
     saveMessages() {
         console.log(this.messages);
-        Object.keys(this.messages).forEach((k) => {localStorage.setItem(k,this.messages[k].recievedText); });
+        Object.keys(this.messages).forEach((k) => {localStorage.setItem('navtex_'+k, this.messages[k].recievedText); });
     };
 
 
@@ -441,6 +443,13 @@ document.getElementById('loadmap').addEventListener('click', () => {
 
 
 document.getElementById('clear').addEventListener('click', () => {
+    for (let i = 0; i < localStorage.length; i++) {
+        const k = localStorage.key(i);
+        if ( k.startsWith('navtex_')) {
+            localStorage.removeItem(k);
+        }
+    }
+
     localStorage.clear();
     document.getElementById('messageIds').innerHTML = '';
     document.getElementById('messageBodies').innerHTML = '';
