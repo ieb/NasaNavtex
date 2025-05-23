@@ -40,6 +40,17 @@ export class OpenSeaMap {
         	console.log("Using same origin for tiles ",document.location.origin );
         }
 
+        // eslint-disable-next-line no-undef
+        this.markerStyle = new ol.style.Style({
+          // eslint-disable-next-line no-undef
+          image: new ol.style.Icon({
+            src: tileBase+"/map.openseamap.org/resources/icons/Needle_Red_32.png",
+            size: [32, 32],
+            anchor: [0.5, 1],
+          }),
+        });
+
+
         const popup = document.getElementById('popup');
         const closer = document.getElementById('popup-closer');
         // eslint-disable-next-line no-undef
@@ -254,6 +265,7 @@ export class OpenSeaMap {
 	}
 
 	addMarkerGroup(markers, html, style) {
+		style = style || this.markerStyle;
 		const source = 	  this.layer_marker.getSource();
 		source.clear(true);
 		let plat = 90;
@@ -282,6 +294,7 @@ export class OpenSeaMap {
 
 
 	addMarker(lat, lon, text, style) {
+	  style = style || this.markerStyle;
         // eslint-disable-next-line no-undef
 	  const coord = ol.proj.fromLonLat([lon, lat]);
         // eslint-disable-next-line no-undef

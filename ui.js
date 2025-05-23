@@ -12,15 +12,6 @@ class UIControl {
         this.messages = {};
         this.updateMessage = this.updateMessage.bind(this);
 
-        // eslint-disable-next-line no-undef
-        this.markerStyle = new ol.style.Style({
-          // eslint-disable-next-line no-undef
-          image: new ol.style.Icon({
-            src: "./map.openseamap.org/resources/icons/Needle_Red_32.png",
-            size: [32, 32],
-            anchor: [0.5, 1],
-          }),
-        });
 
 
         const navareaSelect = document.getElementById('navarea');
@@ -361,7 +352,7 @@ class UIControl {
                 });
                 newEl.setAttribute('focused','focused');
                 if ( this.messages[id].coords.length > 0 ) {
-                    this.openMap.addMarkerGroup(this.messages[id].coords, newEl.innerHTML, this.markerStyle);
+                    this.openMap.addMarkerGroup(this.messages[id].coords, newEl.innerHTML);
                     this.openMap.jumpTo(this.messages[id].stats.minlat, this.messages[id].stats.minlon, 7);
 
                 }
