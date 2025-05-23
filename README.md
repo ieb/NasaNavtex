@@ -14,14 +14,41 @@ This repo contains various applications that use interact with the device. On th
 
 Caveat:  NAVTEX is an old protocol and may not be supported forever with most governments wanting to switch to Imarsat-C. That said, this using uses about 0.25W when its BT chip is not active. Also, Navtex data is widely available from websites, although some may not be uptodate.
 
+# install and local devlopment.
+
+run 
+
+    node server.js
+    open http://localhost:8080/navtex
+
+An installable PWA will be avaiable. The server will cache any tiles requested into ./cache/** which will allow offline operation. The PWA does not cache content as it was found to be too slow when all the tiles where added for a navarea. Before going offline, select the area of interest and click the loadmap button, which will load all the map tiles down to 2NM per tile, ie about 10NM map width.
+
+# webworkers
+
+To make this app work offline it must be able to fetch resources, cache them and go offline. However webworkers do not work cross origin and so can only cache resources (eg map tiles). Tried all sorts of ways and in the end created a localhost proxy server that caches to disk, so that the webworker can load and cache from localhost. All the tile urls are now relative to the webworker location and stored in an on disk cache. 
+
+While the service worker can cache files, that cache does not perform well with 100MB of cached content (10K items), probably due to the lookup mechanism being used. Better to keep the local server running to serve tiles.
+
 # Todo  - Web version
 
 * [x] Implement Sync over BLE
 * [x] Add Navarea, Stations and Message filtering with human readable terms.
 * [ ] Clean up styling
-* [ ] Convert to a webapp
-* [ ] Set time on the device and other parameters.
+* [x] Convert to a webapp
+* [x] Set time on the device and other parameters.
 * [ ] Make available and test as an installable webapp for Chromium or any browser with BLE Web APIs.
 * [ ] Adjust UI for phones.
-
+* [x] Add Open sea map
+* [x] Detect and process lat lon embedded in messages
+* [x] Detect and process WZ cancel 
+* [x] Detect and process lower FEC reports for messages
+* [x] Plot WZ on map
+* [x] Detect time of Day of message reciept
+* [x] Skip re-download of messages with 0 FEC errors.
+* [ ] Add age of message download.
+* [x] Add support for search
+* [ ] Detect lat lon of form 50 10N 000 20E, 53-45.1N 003-54E RACON ON PLATFORM ROLF 55-36.4N
+004-29.5E INOPERATIVE.
+* [ ] Add Show on Map function
+* [x] Add scan functon to pre-load navarea by moving the map over a bounding box
 

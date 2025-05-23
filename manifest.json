@@ -1,0 +1,26 @@
+{
+    "lang": "en-us",
+    "name": "Navtex app",
+    "short_name": "Navtex App",
+    "description": "Nasa Navtex App ",
+    "id": "/navtex/",
+    "start_url": "/navtex/",
+    "scope": "/navtex/",
+    "background_color": "#2f3d58",
+    "theme_color": "#2f3d58",
+    "orientation": "any",
+    "display": "standalone",
+    "icons": [
+        {
+            "src": "/navtex/icon512.png",
+            "sizes": "512x512",
+            "purpose": "any"
+        },
+        {
+            "src": "/navtex/icon512_maskable.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable" // <-- New property value `"maskable"`
+        }
+    ]
+}
