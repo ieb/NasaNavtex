@@ -127,7 +127,11 @@ class UIControl {
 
         document.addEventListener("selectionchange", (e) => {
           const selecton = document.getSelection();
-          this.highlightText = selecton.extentNode.data.substring(selecton.baseOffset, selecton.focusOffset);
+          if ( selecton.extentNode.data ) {
+            this.highlightText = selecton.extentNode.data.substring(selecton.baseOffset, selecton.focusOffset);
+          } else {
+            this.highlightText = '';
+          }
         });
 
         renderStations();
@@ -175,7 +179,7 @@ class UIControl {
     };
     saveMessages() {
         console.log(this.messages);
-        Object.keys(this.messages).forEach((k) => {localStorage.setItem(k,this.messages[k].text); });
+        Object.keys(this.messages).forEach((k) => {localStorage.setItem(k,this.messages[k].recievedText); });
     };
 
 
@@ -204,13 +208,14 @@ class UIControl {
             fecErrors = fecErrorMatch[1];
             fecErrors = fecErrors.replace(':','999');
         } else {
-            console.log("no Fec error count ", text);
+            console.debug("no Fec error count ", text);
             this.messages[id] = text;
             return text;
         }
         if ( fecErrors < this.messages[id].fecErrors ) {
             // lower level of errors, save
             this.messages[id].text = text;
+            this.messages[id].recievedText = recievedText;
             this.messages[id].fecErrors = fecErrors;
             const timeSearch = /^<div>.*?<\/div><div>([0-9]{2}):([0-9]{2})<\/div>/gm;
             const timeMatch = timeSearch.exec(text);
@@ -241,9 +246,9 @@ class UIControl {
             }
 
 
-            const latLonExtract = /([0-9]{2,3})-([0-9]{2}[.,]{0,1}[0-9]{0,4})([NS]{1}) ([0-9]{2,3})-([0-9]{2}[.,]{0,1}[0-9]{0,4})([EW]{1})/gm;
+            const latLonExtract = /([0-9]{1,3})[-\s]{1,3}([0-9]{1,2}[.,]{0,1}[0-9]{0,4})([NS]{0,1})\s*?([0-9]{2,3})[-\s]{1,3}([0-9]{1,2}[.,]{0,1}[0-9]{0,4})([EW]{0,1})/gm;
             const coords = [];
-            while ((m = latLonExtract.exec(text)) !== null) {
+            while ((m = latLonExtract.exec(recievedText)) !== null) {
                 if (m.index === latLonExtract.lastIndex) {
                     latLonExtract.lastIndex++;
                 }
@@ -291,16 +296,19 @@ class UIControl {
     updateMessage(id, recievedText) {
         if ( id == 'status') {
             document.getElementById('status').innerHTML = recievedText;
-            console.log('status', recievedText);
             return;
         }
         id = this.makeSafe(id);
         let text = this.processMessage(id, recievedText);
-        const latLonSearch = /([0-9]{2,3}-[0-9]{2}[.,][0-9]{1,4}[NS]{1} [0-9]{2,3}-[0-9]{2}[.,][0-9]{1,4}[EW]{1})/gm;
-        const latLonSearch2 = /([0-9]{2,3}-[0-9]{2}[NS]{1} [0-9]{2,3}-[0-9]{2}[EW]{1})/gm;
+        const latLonSearch = /([0-9]{1,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[NS]{0,1}\s*?[0-9]{2,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[EW]{0,1})/gm;
+        const latLonSearch2 = /([0-9]{1,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[NS]{0,1})<\/div>/gm
+        const latLonSearch3 = /<div>([0-9]{2,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[EW]{0,1})/gm;
         const latLonSub = '<span class="latlon">$1</span>';
+        const latLonSub2 = '<span class="latlon2">$1</span></div>';
+        const latLonSub3 = '<div><span class="latlon3">$1</span>';
         text = text.replace(latLonSearch, latLonSub);
-        text = text.replace(latLonSearch2, latLonSub);
+        text = text.replace(latLonSearch2, latLonSub2);
+        text = text.replace(latLonSearch3, latLonSub3);
         let elId = document.getElementById(`key_${id}`);
         if ( ! elId ) {
             const newEl = document.createElement('div');
@@ -356,62 +364,6 @@ class UIControl {
 
                 }
             });
-
-    /*
-
-                const latLonExtract = /([0-9]{2,3})-([0-9]{2}[\.,]{0,1}[0-9]{0,4})([NS]{1}) ([0-9]{2,3})-([0-9]{2}[\.,]{0,1}[0-9]{0,4})([EW]{1})/gm;
-                let m;
-                let mlat = 0;
-                let mlon = 0;
-                let markers = [];
-                while( (m = latLonExtract.exec(newEl.innerHTML)) !== null) {
-                    // This is necessary to avoid infinite loops with zero-width matches
-                    if (m.index === latLonExtract.lastIndex) {
-                        latLonExtract.lastIndex++;
-                    }
-                    const lat = toLatLonFloat(m[1],m[2],m[3]);
-                    const lon = toLatLonFloat(m[4],m[5],m[6]);
-                    markers.push({ lat, lon});
-                    mlat = mlat + lat;
-                    mlon = mlon + lon;
-                }
-                if ( markers.length > 0 ) {
-                    mlat = mlat/markers.length;
-                    mlon = mlon/markers.length;
-                }
-                */
-
-    /*
-                if  (e.target.getAttribute('class') == 'latlon') {
-                    if ( e.target.getAttribute('selected') === 'selected') {
-                        e.target.removeAttribute('selected');
-                    } else {
-                        e.target.setAttribute('selected','selected');
-                    }
-
-                    const latLonExtract = /([0-9]{2,3})-([0-9]{2}[\.,]{0,1}[0-9]{0,4})([NS]{1}) ([0-9]{2,3})-([0-9]{2}[\.,]{0,1}[0-9]{0,4})([EW]{1})/gm;
-                    const m = latLonExtract.exec(e.target.innerHTML);
-                    const lat = toLatLonFloat(m[1],m[2],m[3]);
-                    const lon = toLatLonFloat(m[4],m[5],m[6]);                                    
-                    console.log("Matched",e.target.innerHTML,  m);
-                    const markerStyle = new ol.style.Style({
-                      image: new ol.style.Icon({
-                        src: "https://map.openseamap.org/resources/icons/Needle_Red_32.png",
-                        size: [32, 32],
-                        anchor: [0.5, 1],
-                      }),
-                    });
-
-                    openMap.addMarker(lat, lon, text, markerStyle);
-
-                    openMap.jumpTo(lat, lon, 10);
-                    console.log('LatLon ',lat, lon);
-                } else {
-                    console.log('other');
-                    console.log("click", e.target.getAttribute('class'));
-                }
-    */
-
             let added = false;
             const messagesBodies = document.getElementById('messageBodies');
             messagesBodies.append(newEl);

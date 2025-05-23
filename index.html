@@ -17,14 +17,11 @@
 
     </script>
 
-
-    <script src='./openlayers.org/api/2.13.1/OpenLayers.js' ></script>
-    <script src='./www.openstreetmap.org/openlayers/OpenStreetMap.js'></script>
-    <script src='./map.openseamap.org/javascript/ol@v7.3.0/ol.js'></script>
-    <script src='./map.openseamap.org/javascript/harbours.js'></script>
-    <script src='./map.openseamap.org/javascript/map_utils.js'></script>
-    <script src='./map.openseamap.org/javascript/utilities.js'></script>
-
+    <script src="./deps/ol.js"></script>
+    <script src='./deps/harbours.js'></script>
+    <script src='./deps/map_utils.js'></script>
+    <script src='./deps/utilities.js'></script>
+    
     <script type="module" src="ui.js"></script>
 
 
@@ -75,6 +72,12 @@
     }
     .latlon {
         background-color: lightgreen;
+    }
+    .latlon2 {
+        background-color: lightblue;
+    }
+    .latlon3 {
+        background-color: lightslategrey;
     }
     .latlon[selected='selected'] {
         background-color: yellowgreen;

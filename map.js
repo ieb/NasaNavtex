@@ -31,6 +31,15 @@ export class OpenSeaMap {
 
 	drawmap() {
 
+
+        let tileBase = '.';
+        if ( document.location.origin === 'https://blog.tfd.co.uk/' ) {
+        	tileBase = 'https:/';
+        	console.log("Using cors for tiles");
+        } else {
+        	console.log("Using same origin for tiles");
+        }
+
         const popup = document.getElementById('popup');
         const closer = document.getElementById('popup-closer');
         // eslint-disable-next-line no-undef
@@ -123,12 +132,10 @@ export class OpenSeaMap {
 
 
         // base map
-        // eslint-disable-next-line no-undef
-        const urls = [];
 
         // Need to use an ImageTileSource with a loader.
         const baseSource = new ol.source.OSM({
-                url: './t2.openseamap.org/tile/{z}/{x}/{y}.png',
+                url: tileBase+'/t2.openseamap.org/tile/{z}/{x}/{y}.png',
                 crossOrigin: null,
             });
         const layer_mapnik = new ol.layer.Tile({
@@ -151,7 +158,7 @@ export class OpenSeaMap {
                 // url: "https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png"
                 tileUrlFunction: function(coordinate) {
                     // eslint-disable-next-line no-undef
-                    return getTileUrlFunction("./tiles.openseamap.org/seamark/", 'png', coordinate);
+                    return getTileUrlFunction(tileBase+"/tiles.openseamap.org/seamark/", 'png', coordinate);
                     // return "https://tiles.openseamap.org/seamark/" + coordinate[0] + '/' +
                     //     coordinate[1] + '/' + (-coordinate[2] - 1) + '.png';
                 }
@@ -220,11 +227,6 @@ export class OpenSeaMap {
         ].forEach((layer)=> {
             this.map.addLayer(layer);
         });
-
-        console.log("Layer Mapnik", layer_mapnik);
-       console.log("Layer Seamark", layer_seamark);
-       console.log("Layers", this.map.getLayers());
-
 
         this.jumpTo(52.0, 2.0, 10);
 
