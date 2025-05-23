@@ -33,7 +33,7 @@ export class OpenSeaMap {
 
 
         let tileBase = '.';
-        if ( document.location.origin === 'https://blog.tfd.co.uk/' ) {
+        if ( document.location.origin === 'https://blog.tfd.co.uk' ) {
         	tileBase = 'https:/';
         	console.log("Using cors for tiles");
         } else {
