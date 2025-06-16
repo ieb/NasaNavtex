@@ -3,6 +3,7 @@
 
 import {OpenSeaMap} from "./map.js";
 import {navtexStations, NasaNavtex} from "./navtex.js";
+import {AdmiraltyWarnings} from "./websources.js";
 
 class UIControl {
     constructor(opts) {
@@ -19,6 +20,8 @@ class UIControl {
         const stationsSelect = document.getElementById('stations');
         const frequency_a = document.getElementById('frequency_a');
         const frequency_b = document.getElementById('frequency_b');
+        const frequency_c = document.getElementById('frequency_c');
+        const frequency_1 = document.getElementById('frequency_1');
 
         Object.keys(navtexStations.navareas).forEach((na) => {
             const opt = document.createElement('option');
@@ -44,6 +47,12 @@ class UIControl {
             }
             if (frequency_b.checked) {
                 frequencies.push({ id:'b', value:'490KHz'});
+            }
+            if (frequency_c.checked) {
+                frequencies.push({ id:'c', value:'UKC'});
+            }
+            if (frequency_1.checked) {
+                frequencies.push({ id:'1', value:'NA1'});
             }
             frequencies.forEach((frequency) => {
                 const stations = navtexStations.navareas[area][frequency.id];
@@ -153,6 +162,9 @@ class UIControl {
     }
 
 
+    /**
+     * 
+     */ 
     async loadMessages(dummy) {
         if ( dummy ) {
             const response = await fetch("./messageStore.json");
@@ -202,8 +214,8 @@ class UIControl {
             fecErrors = fecErrors.replace(':','999');
         } else {
             console.debug("no Fec error count ", text);
-            this.messages[id] = text;
-            return text;
+            this.messages[id].text = text;
+            this.messages[id].fecErrors = this.messages[id].fecErrors+1; 
         }
         if ( fecErrors < this.messages[id].fecErrors ) {
             // lower level of errors, save
@@ -293,6 +305,7 @@ class UIControl {
         }
         id = this.makeSafe(id);
         let text = this.processMessage(id, recievedText);
+        
         const latLonSearch = /([0-9]{1,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[NS]{0,1}\s*?[0-9]{2,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[EW]{0,1})/gm;
         const latLonSearch2 = /([0-9]{1,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[NS]{0,1})<\/div>/gm
         const latLonSearch3 = /<div>([0-9]{2,3}[-\s]{1,3}[0-9]{1,2}[.,]{0,1}[0-9]{0,4}[EW]{0,1})/gm;
@@ -447,9 +460,15 @@ document.getElementById('clear').addEventListener('click', () => {
 })
 
 
+/**
+ * Synchronise with the BT3 Navtex source. 
+ * Messages are synced into uiControl.updateMessage
+ */ 
 document.getElementById('connect').addEventListener('click', async () => {
     const navtex = new NasaNavtex();
+    // connect over BLE to the Navted device
     if ( await navtex.connect() ){
+        // Call sync on all messages providing a list of current messagees to compare against.
         await navtex.sync(uiControl.updateMessage, uiControl.messages);        
         await navtex.disconnect();
         uiControl.saveMessages();
@@ -457,8 +476,39 @@ document.getElementById('connect').addEventListener('click', async () => {
     } else {
         console.log('Navtex reciever not found');
     }
+});
+
+
+document.getElementById('import_modal_show').addEventListener('click', async () => {
+    document.getElementById('import_modal').setAttribute('visible','yes');
 
 });
+
+document.getElementById('import_modal_cancel').addEventListener('click', async () => {
+    document.getElementById('import_modal').setAttribute('visible','no');
+    
+});
+
+
+document.getElementById('import_modal_import').addEventListener('click', async () => {
+    const sourceMessages = document.getElementById('sourceMessages').innerHTML;
+    const source = new AdmiraltyWarnings();
+    // connect over BLE to the Navted device
+    if ( await source.connect() ){
+        // Call sync on all messages providing a list of current messagees to compare against.
+        await source.sync((id, text) => {
+            console.log(id, text);
+            uiControl.updateMessage(id, text);
+        }, sourceMessages);        
+        await source.disconnect();
+        uiControl.saveMessages();
+        uiControl.cancelMessages();
+        document.getElementById('import_modal').setAttribute('visible','no');
+    } else {
+        console.log('Source not found');
+    }
+});
+
 
 
 

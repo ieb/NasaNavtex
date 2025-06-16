@@ -39,6 +39,12 @@ export const navtexStations = {
                 'K': 'Grindavik   ISL',
                 'L': 'Pinneberg   DEU',
                 'U': 'Cullercoats GBR'
+            },
+            '1': {
+                'U': 'Navarea 1'                
+            },
+            'c': {
+                'U': 'UK Coastal'
             }
         },
         "II": {
