@@ -12,12 +12,12 @@ const port = 8080
 
 
 // load from cache first
-app.use('/navtex', express.static('./cache'));
+app.use('/navtex/cache', express.static('./cache'));
 // then try source
 app.use('/navtex', express.static('./'));
 
 // then try to proxy and save the cache.
-app.use('/navtex',(req, res) => {
+app.use('/navtex/cache',(req, res) => {
 	const file = './cache'+req.path.replace('..','_');
 	fs.mkdir(path.dirname(file), { recursive: true}, () => {
 		const url = 'https:/'+req.path;

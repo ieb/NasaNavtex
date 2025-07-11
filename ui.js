@@ -141,6 +141,8 @@ class UIControl {
         });
 
 
+
+
     }
 
 
@@ -491,7 +493,7 @@ document.getElementById('import_modal_cancel').addEventListener('click', async (
 
 
 document.getElementById('import_modal_import').addEventListener('click', async () => {
-    const sourceMessages = document.getElementById('sourceMessages').innerHTML;
+    const sourceMessages = document.getElementById('sourceMessages').value;
     const source = new AdmiraltyWarnings();
     // connect over BLE to the Navted device
     if ( await source.connect() ){

@@ -18,6 +18,7 @@ import 'https://map.openseamap.org/javascript/map_utils.js');
 import 'https://map.openseamap.org/javascript/utilities.js');
 */
 
+import {cachePaths} from './cachepaths.js';
 
 export class OpenSeaMap {
 	
@@ -32,12 +33,21 @@ export class OpenSeaMap {
 	drawmap() {
 
 
-        let tileBase = '.';
+        let tileBase = './cache';
         if ( document.location.origin === 'https://blog.tfd.co.uk' ) {
         	tileBase = 'https:/';
         	console.log("Using cors for tiles");
         } else {
         	console.log("Using same origin for tiles ",document.location.origin );
+            setTimeout(async () => {
+                for (var i = 0; i < cachePaths.length; i++) {
+                    if ( i%1000 == 0) {
+                        console.log(`Loaded ${i} of ${cachePaths.length}`);
+                    }
+                    await fetch(tileBase+cachePaths[i])
+                }
+                console.log(`Loaded all ${cachePaths.length}`);
+            },10);
         }
 
         // eslint-disable-next-line no-undef
