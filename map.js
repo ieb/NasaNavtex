@@ -18,7 +18,7 @@ import 'https://map.openseamap.org/javascript/map_utils.js');
 import 'https://map.openseamap.org/javascript/utilities.js');
 */
 
-import {cachePaths} from './cachepaths.js';
+// import {cachePaths} from './cachepaths.js';
 
 export class OpenSeaMap {
 	
@@ -39,6 +39,7 @@ export class OpenSeaMap {
         	console.log("Using cors for tiles");
         } else {
         	console.log("Using same origin for tiles ",document.location.origin );
+            /*
             setTimeout(async () => {
                 for (var i = 0; i < cachePaths.length; i++) {
                     if ( i%1000 == 0) {
@@ -48,6 +49,7 @@ export class OpenSeaMap {
                 }
                 console.log(`Loaded all ${cachePaths.length}`);
             },10);
+            */
         }
 
         // eslint-disable-next-line no-undef

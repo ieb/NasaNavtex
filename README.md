@@ -39,6 +39,16 @@ To make this app work offline it must be able to fetch resources, cache them and
 
 While the service worker can cache files, that cache does not perform well with 100MB of cached content (10K items), probably due to the lookup mechanism being used. Better to keep the local server running to serve tiles.
 
+## Fixing local storage cache limits
+
+Performance of the local storage cache deterioates such that at 20K map tiles requests take > 300ms, which is about 50x slower than when the cache has < 1K items.
+
+* Multiple caches does not make a difference, tried upto 50.
+* Using the Origin Private File System works although it requires 2x the number of files to store headers.
+* Its possible to preload the Origin Private File System from local disk, using the FileSystemAPI effectively creating a static web server inside the WebWroker and effectively fixing the problem seen with ChromeOS no longer supporting anything that will allow offline use of PWAs or loading PWAs from localhost. Still have to load the PWA bootstrap.
+
+Current implementation is using a hybrid webworker cache based on the Origin Private File System. response times are arround 10ms measured in the main thread.
+
 # Todo  - Web version
 
 * [x] Implement Sync over BLE
@@ -46,7 +56,7 @@ While the service worker can cache files, that cache does not perform well with 
 * [ ] Clean up styling
 * [x] Convert to a webapp
 * [x] Set time on the device and other parameters.
-* [ ] Make available and test as an installable webapp for Chromium or any browser with BLE Web APIs.
+* [x] Make available and test as an installable webapp for Chromium or any browser with BLE Web APIs.
 * [ ] Adjust UI for phones.
 * [x] Add Open sea map
 * [x] Detect and process lat lon embedded in messages
@@ -61,4 +71,5 @@ While the service worker can cache files, that cache does not perform well with 
 004-29.5E INOPERATIVE.
 * [ ] Add Show on Map function
 * [x] Add scan functon to pre-load navarea by moving the map over a bounding box
+* [x] enable full offline PWA without cache limits
 

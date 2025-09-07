@@ -161,10 +161,30 @@
         <button id="import_modal_show">Import</button>
         <button id="clear">Clear</button> 
         <button id="loadmap">LoadMap</button> 
+        <button id="loadCache">load Cache</button> 
+        <button id="listAllCaches">list Caches</button> 
+        <button id="purgeDiskCache">purge Disk Cache</button> 
+        <button id="purgeWorkerCache">purge Worker Cache</button> 
         <input type="text" id="search" name="search">
         <div>
             <select id="navarea">
-            </select>
+                <option id="I">I North Atlantic, North Sea, Baltic Sea</option>
+                <option id="II">II East Atlantic</option>
+                <option id="III">III Mediterranean Sea</option>
+                <option id="IV">IV West Atlantic</option>
+                <option id="V">V Brasil (none use Imarsat C)</option>
+                <option id="VI">VI Argentina, Uruguay</option>
+                <option id="VII">VII South Africa</option>
+                <option id="VIII">VIII India</option>
+                <option id="IX">IX Arabia</option>
+                <option id="X">X Australia, Imarsat C only</option>
+                <option id="XI">XI East Asia</option>
+                <option id="XII">XII Eastern Pacific</option>
+                <option id="XIII">XIII Russia</option>
+                <option id="XIV">XIV New Zealand, Southern Pacific, none</option>
+                <option id="XV">XV Chile</option>
+                <option id="XVI">XVI Peru</option>
+            </select> 
         </div>
         <div>
             <input type="checkbox" id="frequency_a" name="frequency_a" checked />
@@ -181,12 +201,62 @@
     <div>
         <div>
             <select id="stations" multiple="multiple">
+                <option id="bA">512KHz A Svalbard NOR</option>
+                <option id="aB">512KHz B Bodø    NOR</option> 
+                <option id="aC">512KHz C Vardø   NOR</option> 
+                <option id="aD">512KHz D Tórshavn    FRO</option> 
+                <option id="aE">512KHz E Niton   GBR</option> 
+                <option id="aG">512KHz G Cullercoats GBR</option> 
+                <option id="aH">512KHz H Bjuröklubb  SWE</option> 
+                <option id="aI">512KHz I Grimeton    SWE</option> 
+                <option id="aJ">512KHz J Gislövshammar SWE</option>
+                <option id="aK">512KHz K Niton   GBR</option> 
+                <option id="aL">512KHz L Rogaland    NOR</option> 
+                <option id="aM">512KHz M Jeløy   NOR</option> 
+                <option id="aN">512KHz N Ørlandet    NOR</option> 
+                <option id="aO">512KHz O Portpatrick GBR</option> 
+                <option id="aP">512KHz P Netherlands Coastguard  NLD</option> 
+                <option id="aQ">512KHz Q Malin Head  IRL</option> 
+                <option id="aR">512KHz R Saudanes    ISL</option> 
+                <option id="aS">512KHz S Pinneberg   DEU</option> 
+                <option id="aT">512KHz T Oostende    BEL</option> 
+                <option id="aF">512KHz F Tallinn EST</option> 
+                <option id="aV">512KHz V Oostende    BEL</option> 
+                <option id="aW">512KHz W Valentia    IRL</option> 
+                <option id="bX">512KHz X Grindavik   ISL</option> 
+                <option id="bB">490KHz B Oostende    BE</option>
+                <option id="bC">490KHz C Portpatrick GBR</option>
+                <option id="bE">490KHz E Saudanes    ISL</option>
+                <option id="bI">490KHz I Niton   GBR</option>
+                <option id="bK">490KHz K Grindavik   ISL</option>
+                <option id="bL">490KHz L Pinneberg   DEU</option>
+                <option id="bU">4990KHz U Cullercoats GBR</option>
+                <option id="1U">NA1 U Navarea 1</option>                
+                <option id="1U">UKC U UK Coastal</option>
             </select>
         </div>
     </div>
     <div>
         <div>            
             <select id="messageTypes" multiple="multiple">
+                <option id="A" >A Navigational warnings</option>
+                <option id="B" >B Meteorological warnings</option>
+                <option id="C" >C Ice reports</option>
+                <option id="D" >D Search & rescue, and pirate warnings</option>
+                <option id="E" >E Meteorological forecasts</option>
+                <option id="F" >F Pilot service</option>
+                <option id="G" >G AIS messages</option>
+                <option id="H" >H LORAN messages</option>
+                <option id="I" >I OMEGA messages</option>
+                <option id="J" >J SATNAV messages</option>
+                <option id="K" >K Other electronic</option>
+                <option id="L" >L Navigational warnings</option>
+                <option id="T" >T Test transmissions</option>
+                <option id="V" >V Notice to fishermen</option>
+                <option id="W" >W Environmental</option>
+                <option id="X" >X Special services</option>
+                <option id="Y" >Y Special services</option>
+                <option id="Z" >Z No message</option>
             </select>
         </div>
         

@@ -4,6 +4,7 @@
 import {OpenSeaMap} from "./map.js";
 import {navtexStations, NasaNavtex} from "./navtex.js";
 import {AdmiraltyWarnings} from "./websources.js";
+import {DirectoryLoader} from "./diskcache.js";
 
 class UIControl {
     constructor(opts) {
@@ -23,6 +24,7 @@ class UIControl {
         const frequency_c = document.getElementById('frequency_c');
         const frequency_1 = document.getElementById('frequency_1');
 
+/*
         Object.keys(navtexStations.navareas).forEach((na) => {
             const opt = document.createElement('option');
             opt.setAttribute('id', na);
@@ -36,6 +38,7 @@ class UIControl {
             opt.innerHTML = `${mt} ${navtexStations.messageTypes[mt]}`;
             messageTypeSelect.append(opt);
         });
+*/
 
 
         const renderStations = () =>  {
@@ -481,6 +484,7 @@ document.getElementById('connect').addEventListener('click', async () => {
 });
 
 
+
 document.getElementById('import_modal_show').addEventListener('click', async () => {
     document.getElementById('import_modal').setAttribute('visible','yes');
 
@@ -511,6 +515,41 @@ document.getElementById('import_modal_import').addEventListener('click', async (
     }
 });
 
+
+
+document.getElementById('loadCache').addEventListener('click', async () => {
+    const loader = new DirectoryLoader();
+    const statusEl = document.getElementById('status');
+
+    await loader.load('diskCache', (n, total) => {
+        if (statusEl) {
+            if ( total == -1 ) {
+                statusEl.innerHTML = `DiskCache: scanning source location`;
+            } else if ( n === total) {
+                statusEl.innerHTML = `DiskCache: done Loading ${total}`;
+                setTimeout(() => {
+                    statusEl.innerHTML = '';
+                }, 5000);
+            } else {
+                statusEl.innerHTML = `DiskCache: loaded ${n} of ${total}`;
+            }
+        }
+    });
+});
+
+document.getElementById('listAllCaches').addEventListener('click', async () => {
+    const loader = new DirectoryLoader();
+    await loader.listCache();
+});
+
+document.getElementById('purgeDiskCache').addEventListener('click', async () => {
+    const loader = new DirectoryLoader();
+    await loader.purge('diskCache');
+});
+document.getElementById('purgeWorkerCache').addEventListener('click', async () => {
+    const loader = new DirectoryLoader();
+    await loader.purge('workerCache');
+});
 
 
 
